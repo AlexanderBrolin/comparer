@@ -62,7 +62,10 @@ def _detect_employee_shifts(employee_id: str, punches: list[PunchRecord]) -> lis
             continue
         p = sorted_punches[i]
         hour = p.punch_datetime.hour
-        if not (4 <= hour <= 10):
+        if not (5 <= hour <= 10):
+            # hour=4 (04:00–04:59) is treated as night-shift ending territory;
+            # Pass 3 covers 0–4, and Pass 4 will attribute orphan 04:xx punches
+            # to the previous date where they are filtered out if outside range.
             continue
 
         best_j = None
