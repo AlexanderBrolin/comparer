@@ -78,6 +78,11 @@ def _detect_employee_shifts(employee_id: str, punches: list[PunchRecord]) -> lis
         if best_j is not None:
             end = sorted_punches[best_j]
             hours = (end.punch_datetime - p.punch_datetime).total_seconds() / 3600
+            # Reject implausibly long "day" shifts: a ~13h pairing of
+            # a night-shift end (04:xx) with the next night-shift start (17:xx)
+            # on the same calendar date must not be treated as a day shift.
+            if hours > 12.5:
+                continue
             shifts.append(Shift(
                 employee_id=employee_id,
                 shift_type=ShiftType.DAY,
