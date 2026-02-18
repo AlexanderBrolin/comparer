@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:docs.google.com)",
+      "Bash(python3:*)",
+      "Read(//tmp/**)",
+      "WebFetch(domain:doc-10-5g-sheets.googleusercontent.com)",
+      "Bash(pip3 list:*)",
+      "Bash(pip install:*)",
+      "Bash(source:*)"
+    ]
+  }
+}

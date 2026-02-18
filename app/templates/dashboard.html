@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Schedule Comparer{% endblock %}
+
+{% block body %}
+<div class="app-wrapper">
+    <!-- Header -->
+    <header class="app-header">
+        <div class="header-left">
+            <h1 class="app-title">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M9 12h6m-3-3v6m-7 4h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                </svg>
+                Schedule Comparer
+            </h1>
+        </div>
+        <div class="header-right">
+            <a href="{{ url_for('auth.logout') }}" class="btn-logout">Sign Out</a>
+        </div>
+    </header>
+
+    <!-- Controls Panel -->
+    <section class="controls-panel glass-card">
+        <div class="controls-grid">
+            <!-- File Upload -->
+            <div class="control-group">
+                <label class="control-label">SKUD Export (.xlsx)</label>
+                <div class="upload-zone" id="uploadZone">
+                    <input type="file" id="fileInput" accept=".xlsx" hidden>
+                    <div class="upload-content" id="uploadContent">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+                        </svg>
+                        <span>Drop file here or click to browse</span>
+                    </div>
+                    <div class="upload-file" id="uploadFile" style="display:none">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+                            <polyline points="14 2 14 8 20 8"/>
+                        </svg>
+                        <span id="fileName"></span>
+                        <button type="button" id="clearFile" class="btn-clear">&times;</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Date Range -->
+            <div class="control-group">
+                <label class="control-label">Date From</label>
+                <input type="date" id="dateFrom" class="date-input" value="2026-02-01">
+            </div>
+            <div class="control-group">
+                <label class="control-label">Date To</label>
+                <input type="date" id="dateTo" class="date-input" value="2026-02-16">
+            </div>
+
+            <!-- Start Button -->
+            <div class="control-group control-action">
+                <button id="startBtn" class="btn-start" disabled>
+                    <span class="btn-text">Start</span>
+                    <div class="spinner" style="display:none"></div>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Error Message -->
+    <div id="errorBlock" class="error-block glass-card" style="display:none">
+        <span class="error-icon">!</span>
+        <span id="errorText"></span>
+    </div>
+
+    <!-- Results -->
+    <div id="results" style="display:none">
+        <!-- Summary -->
+        <section class="summary-panel glass-card" id="summaryPanel">
+            <h2 class="section-title">Summary</h2>
+            <div class="summary-grid" id="summaryGrid"></div>
+        </section>
+
+        <!-- Broken Shifts -->
+        <section class="broken-panel glass-card" id="brokenPanel" style="display:none">
+            <div class="section-header" id="brokenToggle">
+                <h2 class="section-title">
+                    Broken Shifts
+                    <span class="badge" id="brokenCount">0</span>
+                </h2>
+                <svg class="chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="6 9 12 15 18 9"/>
+                </svg>
+            </div>
+            <div class="broken-content" id="brokenContent" style="display:none">
+                <div class="table-wrapper">
+                    <table class="data-table" id="brokenTable">
+                        <thead>
+                            <tr>
+                                <th>Employee ID</th>
+                                <th>Name</th>
+                                <th>Date</th>
+                                <th>Punch Time</th>
+                                <th>Estimated Type</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Comparison Matrix -->
+        <section class="matrix-panel glass-card" id="matrixPanel">
+            <h2 class="section-title">Comparison Matrix</h2>
+            <p class="matrix-legend">
+                <span class="legend-item"><span class="legend-dot green"></span> Match (diff = 0)</span>
+                <span class="legend-item"><span class="legend-dot red"></span> Tabell &gt; SKUD (diff &gt; 0)</span>
+                <span class="legend-item"><span class="legend-dot orange"></span> Tabell &lt; SKUD (diff &lt; 0)</span>
+                <span class="legend-item"><span class="legend-dot grey"></span> No data</span>
+                <span class="legend-item"><span class="legend-dot yellow"></span> Broken shift</span>
+            </p>
+            <div class="table-wrapper">
+                <table class="data-table matrix-table" id="matrixTable">
+                    <thead></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+{% endblock %}
