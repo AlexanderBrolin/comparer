@@ -418,22 +418,46 @@ select.date-input {
 .matrix-sticky-top {
     position: sticky;
     top: 0;
+    left: 0;           /* also freeze horizontally */
+    width: 100%;       /* 100% of the visible container width, not scroll width */
     z-index: 15;
     background: var(--bg-secondary);
     border-bottom: 1px solid var(--border-color);
-    margin: 0 -24px;
-    padding: 0 24px;
+}
+/* Sticky on the ENTIRE thead (not individual th) creates ONE stacking context at z=10.
+   All tbody content is at z=0 and guaranteed to render below the header row.
+   Individual th cells do NOT need their own top-sticky — thead handles it. */
+.matrix-table thead {
+    position: sticky;
+    top: var(--matrix-sticky-height, 46px);
+    z-index: 10;
+}
+/* Override: matrix th cells are no longer individually sticky for the top axis */
+.matrix-panel .matrix-table thead th {
+    position: relative;
+    top: auto;
+    z-index: auto;
 }
 .matrix-project-label {
-    padding: 7px 0 5px;
-    font-size: 12px;
-    font-weight: 600;
+    padding: 8px 16px 6px;
+    font-size: 13px;
+    font-weight: 700;
     color: var(--accent);
     text-transform: uppercase;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.12em;
     white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+}
+.matrix-project-label::before,
+.matrix-project-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--accent);
+    opacity: 0.3;
 }
 .matrix-scroll-mirror {
     overflow-x: scroll;
@@ -454,7 +478,7 @@ select.date-input {
 
 /* Column header highlight on row hover */
 .matrix-table thead th.col-highlight {
-    background: rgba(59, 130, 246, 0.15);
+    background: color-mix(in srgb, var(--bg-secondary) 82%, var(--accent) 18%);
     color: var(--accent);
     transition: background 0.15s ease, color 0.15s ease;
 }
@@ -527,9 +551,9 @@ select.date-input {
 .matrix-table thead th:nth-child(3) {
     text-align: left;
     min-width: 80px;
-    position: sticky;
+    position: sticky;  /* sticky LEFT only; vertical handled by thead */
     left: 0;
-    z-index: 4;
+    z-index: 1;  /* above sibling th cells within thead's stacking context */
 }
 .matrix-table thead th:first-child { min-width: 70px; left: 0; }
 .matrix-table thead th:nth-child(2) { min-width: 150px; left: 70px; }
@@ -558,12 +582,14 @@ select.date-input {
 .matrix-cell {
     text-align: center;
     padding: 4px 6px !important;
-    transition: transform 0.15s ease;
+    transition: filter 0.15s ease;
     cursor: default;
     position: relative;
     min-width: 60px;
 }
-.matrix-cell:hover { transform: scale(1.08); z-index: 5; }
+/* filter: brightness does NOT create a z-index stacking context,
+   so hover cells never bleed above the sticky thead. */
+.matrix-cell:hover { filter: brightness(1.35); }
 
 .cell-inner {
     border-radius: 4px;

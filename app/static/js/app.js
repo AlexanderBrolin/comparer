@@ -18,6 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const matrixScrollMirror = document.getElementById('matrixScrollMirror');
     const matrixScrollMirrorInner = document.getElementById('matrixScrollMirrorInner');
     const matrixTableWrapper = document.getElementById('matrixTableWrapper');
+    const matrixStickyTop = document.getElementById('matrixStickyTop');
     const matrixTable = document.getElementById('matrixTable');
 
     // ── Scroll mirror: sync top scrollbar ↔ table wrapper ──────────────────
@@ -328,10 +329,14 @@ document.addEventListener('DOMContentLoaded', () => {
             tbody.appendChild(tr);
         });
 
-        // Sync mirror inner width to full table scroll width (after layout)
+        // Sync mirror width and set thead offset after layout is painted
         requestAnimationFrame(() => {
+            // Mirror inner = full table width so scrollbar range is correct
             matrixScrollMirrorInner.style.width = matrixTable.scrollWidth + 'px';
             matrixScrollMirror.scrollLeft = matrixTableWrapper.scrollLeft;
+            // Tell CSS how tall the sticky bar is so thead sticks right below it
+            const barH = matrixStickyTop.offsetHeight;
+            document.documentElement.style.setProperty('--matrix-sticky-height', barH + 'px');
         });
     }
 
