@@ -8,13 +8,25 @@
     <header class="app-header">
         <div class="header-left">
             <h1 class="app-title">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                     <path d="M9 12h6m-3-3v6m-7 4h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
                 </svg>
                 Schedule Comparer
             </h1>
         </div>
         <div class="header-right">
+            <!-- Theme Switcher -->
+            <div class="theme-switcher" id="themeSwitcher">
+                <button class="theme-btn active" data-theme="elegant">
+                    <span class="theme-swatch theme-swatch--elegant"></span>Elegant
+                </button>
+                <button class="theme-btn" data-theme="polati-light">
+                    <span class="theme-swatch theme-swatch--light"></span>Light
+                </button>
+                <button class="theme-btn" data-theme="polati-dark">
+                    <span class="theme-swatch theme-swatch--dark"></span>Dark
+                </button>
+            </div>
             <a href="{{ url_for('auth.logout') }}" class="btn-logout">Sign Out</a>
         </div>
     </header>

@@ -1,3 +1,33 @@
+// ── Theme switching ─────────────────────────────────────────────────────────
+(function () {
+    const THEMES = ['elegant', 'polati-light', 'polati-dark'];
+    const STORAGE_KEY = 'cc-theme';
+
+    function applyTheme(theme) {
+        if (!THEMES.includes(theme)) theme = 'elegant';
+        document.documentElement.setAttribute('data-theme', theme);
+        localStorage.setItem(STORAGE_KEY, theme);
+        // Update button active states
+        document.querySelectorAll('.theme-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.theme === theme);
+        });
+    }
+
+    // Init: read saved theme
+    const saved = localStorage.getItem(STORAGE_KEY) || 'elegant';
+    applyTheme(saved);
+
+    // Wire up buttons after DOM ready
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.theme-btn').forEach(btn => {
+            btn.addEventListener('click', () => applyTheme(btn.dataset.theme));
+        });
+        // Sync active state in case buttons were rendered after init
+        applyTheme(document.documentElement.getAttribute('data-theme') || saved);
+    });
+})();
+// ────────────────────────────────────────────────────────────────────────────
+
 document.addEventListener('DOMContentLoaded', () => {
     const fileInput = document.getElementById('fileInput');
     const uploadZone = document.getElementById('uploadZone');
