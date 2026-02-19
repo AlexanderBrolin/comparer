@@ -4,7 +4,7 @@ from datetime import datetime, date
 from flask import Blueprint, render_template, request, jsonify, current_app
 from .auth import login_required
 from .services.skud_parser import parse_skud_xlsx
-from .services.sheets_reader import fetch_tabell
+from .services.sheets_reader import fetch_tabell, fetch_projects
 from .services.shift_detector import detect_all_shifts
 from .services.comparator import compare
 from .config import Config
@@ -16,6 +16,18 @@ main_bp = Blueprint('main', __name__)
 @login_required
 def dashboard():
     return render_template('dashboard.html')
+
+
+@main_bp.route('/api/projects', methods=['GET'])
+@login_required
+def api_projects():
+    try:
+        sheet_url = current_app.config['GOOGLE_SHEET_URL']
+        spreadsheet_id, gid = Config.parse_sheet_url(sheet_url)
+        projects = fetch_projects(spreadsheet_id, gid)
+        return jsonify({'projects': projects})
+    except Exception as e:
+        return jsonify({'projects': [], 'warning': str(e)})
 
 
 @main_bp.route('/api/compare', methods=['POST'])
@@ -48,6 +60,8 @@ def api_compare():
     filepath = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
     file.save(filepath)
 
+    selected_project = request.form.get('project', '').strip()
+
     try:
         # 1. Parse SKUD XLSX
         punches = parse_skud_xlsx(filepath, date_from, date_to)
@@ -56,6 +70,10 @@ def api_compare():
         sheet_url = current_app.config['GOOGLE_SHEET_URL']
         spreadsheet_id, gid = Config.parse_sheet_url(sheet_url)
         tabell_entries = fetch_tabell(spreadsheet_id, gid, date_from, date_to)
+
+        # Filter by project if specified
+        if selected_project:
+            tabell_entries = [e for e in tabell_entries if e.project == selected_project]
 
         # 3. Detect shifts
         shifts_by_employee, broken_shifts = detect_all_shifts(punches, date_from, date_to)

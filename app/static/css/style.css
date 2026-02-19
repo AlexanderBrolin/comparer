@@ -186,7 +186,7 @@ body {
 .controls-panel { padding: 24px; margin-bottom: 24px; }
 .controls-grid {
     display: grid;
-    grid-template-columns: 2fr 1fr 1fr auto;
+    grid-template-columns: 2fr 1.5fr 1fr 1fr auto;
     gap: 20px;
     align-items: end;
 }

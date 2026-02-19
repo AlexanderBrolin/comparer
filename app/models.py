@@ -36,6 +36,7 @@ class TabellEntry:
     company: str
     month: str
     daily_hours: dict  # day_number (int) -> hours (float)
+    project: str = ''
 
 
 @dataclass

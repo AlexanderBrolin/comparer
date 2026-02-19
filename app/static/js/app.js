@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const clearFile = document.getElementById('clearFile');
     const dateFrom = document.getElementById('dateFrom');
     const dateTo = document.getElementById('dateTo');
+    const projectSelect = document.getElementById('projectSelect');
     const startBtn = document.getElementById('startBtn');
     const btnText = startBtn.querySelector('.btn-text');
     const spinner = startBtn.querySelector('.spinner');
@@ -15,6 +16,24 @@ document.addEventListener('DOMContentLoaded', () => {
     const results = document.getElementById('results');
 
     let selectedFile = null;
+
+    // Load project list from server
+    async function loadProjects() {
+        try {
+            const resp = await fetch('/api/projects');
+            const data = await resp.json();
+            const projects = data.projects || [];
+            projects.forEach(p => {
+                const opt = document.createElement('option');
+                opt.value = p;
+                opt.textContent = p;
+                projectSelect.appendChild(opt);
+            });
+        } catch (_) {
+            // keep "All Projects" default, silently ignore
+        }
+    }
+    loadProjects();
 
     // File upload handling
     uploadZone.addEventListener('click', () => fileInput.click());
@@ -80,6 +99,7 @@ document.addEventListener('DOMContentLoaded', () => {
         formData.append('xlsx_file', selectedFile);
         formData.append('date_from', dateFrom.value);
         formData.append('date_to', dateTo.value);
+        formData.append('project', projectSelect.value);
 
         try {
             const resp = await fetch('/api/compare', {
@@ -175,6 +195,13 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
 
+    function localISODate(d) {
+        const y = d.getFullYear();
+        const m = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${y}-${m}-${day}`;
+    }
+
     function renderMatrix(comparison, dateRange) {
         const thead = document.querySelector('#matrixTable thead');
         const tbody = document.querySelector('#matrixTable tbody');
@@ -183,12 +210,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (!comparison || comparison.length === 0) return;
 
-        // Generate date columns
+        // Generate date columns using local date components (not UTC) to avoid timezone shift
         const dates = [];
         const from = new Date(dateRange[0] + 'T00:00:00');
         const to = new Date(dateRange[1] + 'T00:00:00');
         for (let d = new Date(from); d <= to; d.setDate(d.getDate() + 1)) {
-            dates.push(d.toISOString().split('T')[0]);
+            dates.push(localISODate(d));
         }
 
         // Header row

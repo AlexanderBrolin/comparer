@@ -40,18 +40,46 @@ def parse_hours(cell_value: str) -> float:
         return 0.0
 
 
+def _detect_project_col(rows: list) -> int | None:
+    """Find the 'Project' column index from the header row (row 0)."""
+    if not rows:
+        return None
+    for i, cell in enumerate(rows[0]):
+        if cell and 'project' in str(cell).strip().lower():
+            return i
+    return None
+
+
+def _load_sheet(spreadsheet_id: str, gid: str) -> list[list[str]]:
+    url = f'https://docs.google.com/spreadsheets/d/{spreadsheet_id}/export?format=csv&gid={gid}'
+    req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+    resp = urllib.request.urlopen(req, timeout=30)
+    data = resp.read().decode('utf-8')
+    return list(csv.reader(io.StringIO(data)))
+
+
+def fetch_projects(spreadsheet_id: str, gid: str) -> list[str]:
+    """Return sorted list of unique project names from the sheet."""
+    rows = _load_sheet(spreadsheet_id, gid)
+    project_col = _detect_project_col(rows)
+    if project_col is None:
+        return []
+    projects: set[str] = set()
+    for row in rows[DATA_START_ROW:]:
+        if len(row) > project_col:
+            val = row[project_col].strip()
+            if val:
+                projects.add(val)
+    return sorted(projects)
+
+
 def fetch_tabell(spreadsheet_id: str, gid: str, date_from: date, date_to: date) -> list[TabellEntry]:
     """Fetch tabell data from Google Sheets via CSV export.
 
     Returns list of TabellEntry objects filtered to months covered by the date range.
     """
-    url = f'https://docs.google.com/spreadsheets/d/{spreadsheet_id}/export?format=csv&gid={gid}'
-    req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
-    resp = urllib.request.urlopen(req, timeout=30)
-    data = resp.read().decode('utf-8')
-
-    reader = csv.reader(io.StringIO(data))
-    rows = list(reader)
+    rows = _load_sheet(spreadsheet_id, gid)
+    project_col = _detect_project_col(rows)
 
     if len(rows) < DATA_START_ROW + 1:
         return []
@@ -94,6 +122,7 @@ def fetch_tabell(spreadsheet_id: str, gid: str, date_from: date, date_to: date) 
         name = row[COL_NAME].strip() if len(row) > COL_NAME else ''
         job_title = row[COL_JOB_TITLE].strip() if len(row) > COL_JOB_TITLE else ''
         company = row[COL_COMPANY].strip() if len(row) > COL_COMPANY else ''
+        project = row[project_col].strip() if project_col is not None and len(row) > project_col else ''
 
         # Parse daily hours (columns 10-40 = days 1-31)
         daily_hours = {}
@@ -109,6 +138,7 @@ def fetch_tabell(spreadsheet_id: str, gid: str, date_from: date, date_to: date) 
             company=company,
             month=month_str.capitalize(),
             daily_hours=daily_hours,
+            project=project,
         ))
 
     return entries
