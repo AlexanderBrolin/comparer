@@ -18,6 +18,7 @@ def dashboard():
     return render_template('dashboard.html')
 
 
+
 @main_bp.route('/api/projects', methods=['GET'])
 @login_required
 def api_projects():

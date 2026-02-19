@@ -41,11 +41,20 @@ def parse_hours(cell_value: str) -> float:
 
 
 def _detect_project_col(rows: list) -> int | None:
-    """Find the 'Project' column index from the header row (row 0)."""
-    if not rows:
+    """Find the 'Project' column index.
+
+    Row 0 contains merged-cell artifacts ('Col1', 'Col2', ...) from Google Sheets.
+    Row 1 contains the real column headers — search there.
+
+    Uses exact match first (header == "project"), then falls back to a header
+    that IS exactly 'project' after stripping newlines and spaces. Many other
+    headers contain the word "project" as part of a longer phrase — those are
+    excluded by requiring an exact match.
+    """
+    if len(rows) < 2:
         return None
-    for i, cell in enumerate(rows[0]):
-        if cell and 'project' in str(cell).strip().lower():
+    for i, cell in enumerate(rows[1]):
+        if cell and str(cell).strip().lower().replace('\n', ' ').strip() == 'project':
             return i
     return None
 
