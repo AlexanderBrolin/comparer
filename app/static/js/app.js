@@ -14,6 +14,45 @@ document.addEventListener('DOMContentLoaded', () => {
     const errorBlock = document.getElementById('errorBlock');
     const errorText = document.getElementById('errorText');
     const results = document.getElementById('results');
+    const matrixProjectLabel = document.getElementById('matrixProjectLabel');
+    const matrixScrollMirror = document.getElementById('matrixScrollMirror');
+    const matrixScrollMirrorInner = document.getElementById('matrixScrollMirrorInner');
+    const matrixTableWrapper = document.getElementById('matrixTableWrapper');
+    const matrixTable = document.getElementById('matrixTable');
+
+    // ── Scroll mirror: sync top scrollbar ↔ table wrapper ──────────────────
+    (function () {
+        let syncing = false;
+        matrixScrollMirror.addEventListener('scroll', () => {
+            if (syncing) return;
+            syncing = true;
+            matrixTableWrapper.scrollLeft = matrixScrollMirror.scrollLeft;
+            syncing = false;
+        });
+        matrixTableWrapper.addEventListener('scroll', () => {
+            if (syncing) return;
+            syncing = true;
+            matrixScrollMirror.scrollLeft = matrixTableWrapper.scrollLeft;
+            syncing = false;
+        });
+    })();
+
+    // ── Column header highlight on row hover ────────────────────────────────
+    matrixTable.addEventListener('mouseover', (e) => {
+        const td = e.target.closest('td');
+        if (!td || !td.closest('tbody')) return;
+        const colIdx = td.cellIndex;
+        const headerRow = matrixTable.tHead && matrixTable.tHead.rows[0];
+        if (!headerRow) return;
+        Array.from(headerRow.cells).forEach((th, i) => {
+            th.classList.toggle('col-highlight', i === colIdx);
+        });
+    });
+    matrixTable.addEventListener('mouseleave', () => {
+        const headerRow = matrixTable.tHead && matrixTable.tHead.rows[0];
+        if (!headerRow) return;
+        Array.from(headerRow.cells).forEach(th => th.classList.remove('col-highlight'));
+    });
 
     let selectedFile = null;
 
@@ -208,6 +247,10 @@ document.addEventListener('DOMContentLoaded', () => {
         thead.innerHTML = '';
         tbody.innerHTML = '';
 
+        // Update project label in sticky bar
+        const selOpt = projectSelect.options[projectSelect.selectedIndex];
+        matrixProjectLabel.textContent = (selOpt && selOpt.value) ? selOpt.text : 'All Projects';
+
         if (!comparison || comparison.length === 0) return;
 
         // Generate date columns using local date components (not UTC) to avoid timezone shift
@@ -283,6 +326,12 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             tbody.appendChild(tr);
+        });
+
+        // Sync mirror inner width to full table scroll width (after layout)
+        requestAnimationFrame(() => {
+            matrixScrollMirrorInner.style.width = matrixTable.scrollWidth + 'px';
+            matrixScrollMirror.scrollLeft = matrixTableWrapper.scrollLeft;
         });
     }
 

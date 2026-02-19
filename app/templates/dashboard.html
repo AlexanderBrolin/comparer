@@ -125,7 +125,14 @@
                 <span class="legend-item"><span class="legend-dot grey"></span> No data</span>
                 <span class="legend-item"><span class="legend-dot yellow"></span> Broken shift</span>
             </p>
-            <div class="table-wrapper">
+            <!-- Sticky bar: project label + top horizontal scrollbar -->
+            <div class="matrix-sticky-top" id="matrixStickyTop">
+                <div class="matrix-project-label" id="matrixProjectLabel">All Projects</div>
+                <div class="matrix-scroll-mirror" id="matrixScrollMirror">
+                    <div class="matrix-scroll-mirror-inner" id="matrixScrollMirrorInner"></div>
+                </div>
+            </div>
+            <div class="table-wrapper" id="matrixTableWrapper">
                 <table class="data-table matrix-table" id="matrixTable">
                     <thead></thead>
                     <tbody></tbody>

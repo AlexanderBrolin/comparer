@@ -402,6 +402,63 @@ select.date-input {
 /* ===== Tables ===== */
 .table-wrapper { overflow-x: auto; }
 
+/* Matrix table wrapper: fixed viewport height with its own scroll */
+.matrix-panel .table-wrapper {
+    max-height: calc(100vh - 220px);
+    min-height: 300px;
+    overflow: auto;
+}
+/* Hide horizontal scrollbar on matrix wrapper — top mirror replaces it */
+.matrix-panel .table-wrapper::-webkit-scrollbar:horizontal {
+    height: 0;
+    display: none;
+}
+
+/* ===== Matrix Sticky Top Bar ===== */
+.matrix-sticky-top {
+    position: sticky;
+    top: 0;
+    z-index: 15;
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border-color);
+    margin: 0 -24px;
+    padding: 0 24px;
+}
+.matrix-project-label {
+    padding: 7px 0 5px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.matrix-scroll-mirror {
+    overflow-x: scroll;
+    overflow-y: hidden;
+    height: 14px;
+}
+.matrix-scroll-mirror::-webkit-scrollbar { height: 8px; }
+.matrix-scroll-mirror::-webkit-scrollbar-track {
+    background: var(--bg-secondary);
+    border-radius: 4px;
+}
+.matrix-scroll-mirror::-webkit-scrollbar-thumb {
+    background: var(--text-muted);
+    border-radius: 4px;
+}
+.matrix-scroll-mirror::-webkit-scrollbar-thumb:hover { background: var(--text-secondary); }
+.matrix-scroll-mirror-inner { height: 1px; }
+
+/* Column header highlight on row hover */
+.matrix-table thead th.col-highlight {
+    background: rgba(59, 130, 246, 0.15);
+    color: var(--accent);
+    transition: background 0.15s ease, color 0.15s ease;
+}
+
 .data-table {
     width: 100%;
     border-collapse: separate;
@@ -419,7 +476,7 @@ select.date-input {
     text-align: left;
     position: sticky;
     top: 0;
-    z-index: 2;
+    z-index: 3;
     border-bottom: 1px solid var(--border-color);
 }
 
@@ -472,7 +529,7 @@ select.date-input {
     min-width: 80px;
     position: sticky;
     left: 0;
-    z-index: 3;
+    z-index: 4;
 }
 .matrix-table thead th:first-child { min-width: 70px; left: 0; }
 .matrix-table thead th:nth-child(2) { min-width: 150px; left: 70px; }
@@ -482,12 +539,17 @@ select.date-input {
 .matrix-table tbody td:nth-child(2),
 .matrix-table tbody td:nth-child(3) {
     position: sticky;
-    background: var(--bg-card);
-    z-index: 1;
+    background: var(--bg-secondary);
+    z-index: 2;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     max-width: 150px;
+}
+.matrix-table tbody tr:hover td:first-child,
+.matrix-table tbody tr:hover td:nth-child(2),
+.matrix-table tbody tr:hover td:nth-child(3) {
+    background: rgba(30, 41, 59, 0.95);
 }
 .matrix-table tbody td:first-child { left: 0; font-weight: 600; }
 .matrix-table tbody td:nth-child(2) { left: 70px; }
