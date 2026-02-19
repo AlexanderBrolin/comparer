@@ -21,6 +21,8 @@
     --yellow-bg: rgba(234, 179, 8, 0.15);
     --grey: #475569;
     --grey-bg: rgba(71, 85, 105, 0.2);
+    --purple: #a855f7;
+    --purple-bg: rgba(168, 85, 247, 0.15);
     --radius: 12px;
     --radius-sm: 8px;
     --shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
@@ -537,6 +539,7 @@ select.date-input {
 .legend-dot.orange { background: var(--orange); }
 .legend-dot.grey { background: var(--grey); }
 .legend-dot.yellow { background: var(--yellow); }
+.legend-dot.purple { background: var(--purple); }
 
 .matrix-table {
     font-size: 12px;
@@ -622,6 +625,9 @@ select.date-input {
 
 .cell-yellow .cell-inner { background: var(--yellow-bg); }
 .cell-yellow .cell-diff { color: var(--yellow); }
+
+.cell-purple .cell-inner { background: var(--purple-bg); }
+.cell-purple .cell-diff { color: var(--purple); }
 
 /* ===== Animations ===== */
 @keyframes fadeInUp {

@@ -311,6 +311,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 } else if (day.tabell === 0 && day.skud === 0) {
                     td.classList.add('cell-grey');
                     td.innerHTML = '<div class="cell-inner"><div class="cell-diff">-</div></div>';
+                } else if (day.tabell > 0 && day.skud === 0) {
+                    td.classList.add('cell-purple');
+                    td.innerHTML = `
+                        <div class="cell-inner">
+                            <div class="cell-hours">${day.tabell} / 0</div>
+                            <div class="cell-diff">N</div>
+                        </div>`;
                 } else {
                     const colorClass = day.diff === 0 ? 'cell-green'
                         : day.diff > 0 ? 'cell-red'
