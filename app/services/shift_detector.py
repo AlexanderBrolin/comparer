@@ -120,8 +120,10 @@ def _detect_employee_shifts(employee_id: str, punches: list[PunchRecord]) -> lis
             q = sorted_punches[j]
             if q.punch_date > next_date:
                 break
-            if q.punch_date == next_date and q.punch_datetime.hour <= 13:
-                best_j = j
+            if q.punch_date == p.punch_date:
+                best_j = j  # same-day end (employee left before midnight)
+            elif q.punch_date == next_date and q.punch_datetime.hour <= 13:
+                best_j = j  # next-day morning end (crossed midnight)
 
         if best_j is not None:
             end = sorted_punches[best_j]
