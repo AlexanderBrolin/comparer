@@ -580,6 +580,26 @@ select.date-input {
 
 /* ===== Matrix Table ===== */
 .matrix-panel { padding: 24px; margin-bottom: 24px; }
+.matrix-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+}
+.matrix-header .section-title { margin-bottom: 0; }
+.matrix-search {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+    font-size: 13px;
+    padding: 7px 12px;
+    width: 200px;
+    transition: border-color var(--transition);
+    outline: none;
+}
+.matrix-search::placeholder { color: var(--text-secondary); }
+.matrix-search:focus { border-color: var(--accent); }
 
 .matrix-legend {
     display: flex;

@@ -50,6 +50,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const matrixTableWrapper = document.getElementById('matrixTableWrapper');
     const matrixStickyTop = document.getElementById('matrixStickyTop');
     const matrixTable = document.getElementById('matrixTable');
+    const matrixSearch = document.getElementById('matrixSearch');
+
+    matrixSearch.addEventListener('input', () => {
+        const q = matrixSearch.value.trim().toLowerCase();
+        Array.from(matrixTable.tBodies[0].rows).forEach(tr => {
+            const id = tr.cells[0] ? tr.cells[0].textContent.toLowerCase() : '';
+            tr.style.display = (!q || id.includes(q)) ? '' : 'none';
+        });
+    });
 
     // ── Scroll mirror: sync top scrollbar ↔ table wrapper ──────────────────
     (function () {
@@ -204,6 +213,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function renderResults(data) {
         results.style.display = '';
+        matrixSearch.value = '';
         renderPeriodTotals(data.summary.period_totals);
         renderMatrix(data.comparison, data.summary.date_range);
     }
