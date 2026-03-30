@@ -184,6 +184,67 @@ body {
     background: rgba(255, 255, 255, 0.05);
 }
 
+/* ===== Nav tabs ===== */
+.nav-tabs {
+    display: flex;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    padding: 3px;
+    gap: 2px;
+}
+.btn-nav {
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 6px 14px;
+    border-radius: calc(var(--radius-sm) - 2px);
+    transition: all var(--transition);
+}
+.btn-nav:hover {
+    color: var(--text-primary);
+    background: rgba(255, 255, 255, 0.06);
+}
+.btn-nav.active {
+    color: #fff;
+    background: var(--accent);
+    box-shadow: 0 1px 6px rgba(99, 102, 241, 0.4);
+}
+
+/* ===== Period Totals ===== */
+.period-totals-panel { padding: 24px; margin-bottom: 24px; }
+.period-totals-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 16px;
+}
+.period-totals-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    padding: 20px 24px;
+}
+.period-totals-heading {
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--text-secondary);
+    margin-bottom: 16px;
+}
+.period-totals-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border-color);
+}
+.period-totals-row:last-child { border-bottom: none; }
+.period-totals-label { color: var(--text-secondary); font-size: 14px; }
+.period-totals-value { font-size: 22px; font-weight: 700; color: var(--text-primary); }
+
 /* ===== Controls Panel ===== */
 .controls-panel { padding: 24px; margin-bottom: 24px; }
 .controls-grid {
@@ -628,6 +689,27 @@ select.date-input {
 
 .cell-purple .cell-inner { background: var(--purple-bg); }
 .cell-purple .cell-diff { color: var(--purple); }
+
+/* ===== Sortable / Totals columns ===== */
+.sortable-col {
+    cursor: pointer;
+    user-select: none;
+    white-space: nowrap;
+}
+.sortable-col:hover { color: var(--text-primary); }
+.sort-arrow { font-style: normal; margin-left: 4px; opacity: 0.5; }
+.sortable-col.sort-active { color: var(--text-primary); }
+.sortable-col.sort-active .sort-arrow { opacity: 1; }
+
+.totals-cell {
+    text-align: center;
+    font-weight: 600;
+    font-size: 13px;
+    white-space: nowrap;
+    border-left: 1px solid var(--border-color);
+}
+.totals-cell:last-of-type { border-right: 1px solid var(--border-color); }
+.totals-warn { color: #f87171; }
 
 /* ===== Animations ===== */
 @keyframes fadeInUp {

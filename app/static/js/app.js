@@ -204,9 +204,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function renderResults(data) {
         results.style.display = '';
-        renderSummary(data.summary);
-        renderBroken(data.broken_shifts);
+        renderPeriodTotals(data.summary.period_totals);
         renderMatrix(data.comparison, data.summary.date_range);
+    }
+
+    function renderPeriodTotals(pt) {
+        document.getElementById('tabellHours').textContent     = pt.tabell.hours;
+        document.getElementById('tabellDays').textContent      = pt.tabell.days;
+        document.getElementById('tabellEmployees').textContent = pt.tabell.employees;
+        document.getElementById('skudHours').textContent       = pt.skud.hours;
+        document.getElementById('skudDays').textContent        = pt.skud.days;
+        document.getElementById('skudEmployees').textContent   = pt.skud.employees;
     }
 
     function renderSummary(summary) {
@@ -272,6 +280,18 @@ document.addEventListener('DOMContentLoaded', () => {
         return `${y}-${m}-${day}`;
     }
 
+    // ── Sort state ──────────────────────────────────────────────────────────
+    let currentSortField = null;
+    let currentSortDir = 'desc';
+
+    function sortComparison(comparison, field, dir) {
+        return [...comparison].sort((a, b) => {
+            const av = a.totals[field];
+            const bv = b.totals[field];
+            return dir === 'desc' ? bv - av : av - bv;
+        });
+    }
+
     function renderMatrix(comparison, dateRange) {
         const thead = document.querySelector('#matrixTable thead');
         const tbody = document.querySelector('#matrixTable tbody');
@@ -295,6 +315,30 @@ document.addEventListener('DOMContentLoaded', () => {
         // Header row
         const headerRow = document.createElement('tr');
         headerRow.innerHTML = '<th>ID</th><th>Name</th><th>Position</th>';
+
+        const sortCols = [
+            { field: 'broken_count',  label: 'Broken'        },
+            { field: 'absence_count', label: 'N'             },
+            { field: 'skud_hours',    label: 'Hours (SKUD)'  },
+            { field: 'tabell_hours',  label: 'Hours (Tabell)'},
+        ];
+        sortCols.forEach(({ field, label }) => {
+            const th = document.createElement('th');
+            th.className = 'sortable-col';
+            th.dataset.field = field;
+            th.innerHTML = `${label} <span class="sort-arrow"></span>`;
+            th.addEventListener('click', () => {
+                if (currentSortField === field) {
+                    currentSortDir = currentSortDir === 'desc' ? 'asc' : 'desc';
+                } else {
+                    currentSortField = field;
+                    currentSortDir = 'desc';
+                }
+                renderMatrix(comparison, dateRange);
+            });
+            headerRow.appendChild(th);
+        });
+
         dates.forEach(d => {
             const th = document.createElement('th');
             const parts = d.split('-');
@@ -303,8 +347,22 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         thead.appendChild(headerRow);
 
+        // Update sort arrow indicators
+        headerRow.querySelectorAll('.sortable-col').forEach(th => {
+            const active = th.dataset.field === currentSortField;
+            th.classList.toggle('sort-active', active);
+            th.querySelector('.sort-arrow').textContent = active
+                ? (currentSortDir === 'desc' ? '▼' : '▲')
+                : '';
+        });
+
+        // Apply sort if active
+        const displayComparison = currentSortField
+            ? sortComparison(comparison, currentSortField, currentSortDir)
+            : comparison;
+
         // Data rows
-        comparison.forEach(row => {
+        displayComparison.forEach(row => {
             const tr = document.createElement('tr');
 
             // Fixed columns
@@ -321,6 +379,20 @@ document.addEventListener('DOMContentLoaded', () => {
             tdJob.textContent = row.job_title;
             tdJob.title = row.job_title;
             tr.appendChild(tdJob);
+
+            // Totals cells
+            const t = row.totals;
+            [
+                { val: t.broken_count,  warn: t.broken_count > 0  },
+                { val: t.absence_count, warn: t.absence_count > 0 },
+                { val: t.skud_hours,    warn: false                },
+                { val: t.tabell_hours,  warn: false                },
+            ].forEach(({ val, warn }) => {
+                const td = document.createElement('td');
+                td.className = 'totals-cell' + (warn ? ' totals-warn' : '');
+                td.textContent = val;
+                tr.appendChild(td);
+            });
 
             // Date cells
             dates.forEach(d => {

@@ -92,37 +92,39 @@
 
     <!-- Results -->
     <div id="results" style="display:none">
-        <!-- Summary -->
-        <section class="summary-panel glass-card" id="summaryPanel">
-            <h2 class="section-title">Summary</h2>
-            <div class="summary-grid" id="summaryGrid"></div>
-        </section>
-
-        <!-- Broken Shifts -->
-        <section class="broken-panel glass-card" id="brokenPanel" style="display:none">
-            <div class="section-header" id="brokenToggle">
-                <h2 class="section-title">
-                    Broken Shifts
-                    <span class="badge" id="brokenCount">0</span>
-                </h2>
-                <svg class="chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polyline points="6 9 12 15 18 9"/>
-                </svg>
-            </div>
-            <div class="broken-content" id="brokenContent" style="display:none">
-                <div class="table-wrapper">
-                    <table class="data-table" id="brokenTable">
-                        <thead>
-                            <tr>
-                                <th>Employee ID</th>
-                                <th>Name</th>
-                                <th>Date</th>
-                                <th>Punch Time</th>
-                                <th>Estimated Type</th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
+        <!-- Period Totals -->
+        <section class="glass-card period-totals-panel">
+            <h2 class="section-title">Period Totals</h2>
+            <div class="period-totals-grid">
+                <div class="period-totals-card">
+                    <div class="period-totals-heading">By Tabell</div>
+                    <div class="period-totals-row">
+                        <span class="period-totals-label">Hours</span>
+                        <span class="period-totals-value" id="tabellHours">—</span>
+                    </div>
+                    <div class="period-totals-row">
+                        <span class="period-totals-label">Days</span>
+                        <span class="period-totals-value" id="tabellDays">—</span>
+                    </div>
+                    <div class="period-totals-row">
+                        <span class="period-totals-label">Employees</span>
+                        <span class="period-totals-value" id="tabellEmployees">—</span>
+                    </div>
+                </div>
+                <div class="period-totals-card">
+                    <div class="period-totals-heading">By SKUD</div>
+                    <div class="period-totals-row">
+                        <span class="period-totals-label">Hours</span>
+                        <span class="period-totals-value" id="skudHours">—</span>
+                    </div>
+                    <div class="period-totals-row">
+                        <span class="period-totals-label">Days</span>
+                        <span class="period-totals-value" id="skudDays">—</span>
+                    </div>
+                    <div class="period-totals-row">
+                        <span class="period-totals-label">Employees</span>
+                        <span class="period-totals-value" id="skudEmployees">—</span>
+                    </div>
                 </div>
             </div>
         </section>

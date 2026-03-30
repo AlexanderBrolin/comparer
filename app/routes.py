@@ -19,6 +19,7 @@ def dashboard():
 
 
 
+
 @main_bp.route('/api/projects', methods=['GET'])
 @login_required
 def api_projects():

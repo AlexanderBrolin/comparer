@@ -76,11 +76,25 @@ def compare(
                 'shift_type': shift_type,
             }
 
+        broken_count = sum(1 for v in days_data.values() if v['broken'])
+        absence_count = sum(
+            1 for v in days_data.values()
+            if v['tabell'] > 0 and v['skud'] == 0 and not v['broken']
+        )
+        skud_hours_total = round(sum(v['skud'] for v in days_data.values()), 1)
+        tabell_hours_total = round(sum(v['tabell'] for v in days_data.values()), 1)
+
         comparison.append({
             'employee_id': emp_id,
             'name': name,
             'job_title': job_title,
             'days': days_data,
+            'totals': {
+                'broken_count': broken_count,
+                'absence_count': absence_count,
+                'skud_hours': skud_hours_total,
+                'tabell_hours': tabell_hours_total,
+            },
         })
 
     # Format broken shifts for output
@@ -98,6 +112,34 @@ def compare(
             'estimated_type': _estimate_shift_type(s.start_punch.hour),
         })
 
+    # Period totals
+    tabell_days = set()
+    skud_days = set()
+    tabell_emp_hours = defaultdict(float)
+    skud_emp_hours = defaultdict(float)
+
+    for row in comparison:
+        for d_str, v in row['days'].items():
+            if v['tabell'] > 0:
+                tabell_days.add(d_str)
+                tabell_emp_hours[row['employee_id']] += v['tabell']
+            if v['skud'] > 0:
+                skud_days.add(d_str)
+                skud_emp_hours[row['employee_id']] += v['skud']
+
+    period_totals = {
+        'tabell': {
+            'hours': round(sum(tabell_emp_hours.values()), 1),
+            'days': len(tabell_days),
+            'employees': sum(1 for h in tabell_emp_hours.values() if h > 0),
+        },
+        'skud': {
+            'hours': round(sum(skud_emp_hours.values()), 1),
+            'days': len(skud_days),
+            'employees': sum(1 for h in skud_emp_hours.values() if h > 0),
+        },
+    }
+
     # Summary
     matched = sum(1 for emp_id in all_emp_ids if emp_id in skud_hours)
     summary = {
@@ -106,6 +148,7 @@ def compare(
         'matched_employees': matched,
         'broken_count': len(broken_shifts),
         'date_range': [date_from.isoformat(), date_to.isoformat()],
+        'period_totals': period_totals,
     }
 
     return {

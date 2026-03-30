@@ -10,7 +10,8 @@
       "Bash(source:*)",
       "Bash(python -m venv:*)",
       "Bash(venv/Scripts/pip install:*)",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "Bash(venv/Scripts/python -c \":*)"
     ]
   }
 }
