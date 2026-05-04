@@ -33,13 +33,23 @@ def compare(
     for entry in tabell_entries:
         tabell_by_emp[entry.employee_id].append(entry)
 
-    # Build SKUD hours index: {employee_id: {date: total_hours}}
-    skud_hours = defaultdict(lambda: defaultdict(float))
-    skud_shift_types = defaultdict(lambda: defaultdict(str))
+    # Build SKUD hours index split by shift type: {employee_id: {date: hours}}
+    skud_day_hours = defaultdict(lambda: defaultdict(float))
+    skud_night_hours = defaultdict(lambda: defaultdict(float))
     for emp_id, shifts in shifts_by_employee.items():
         for s in shifts:
-            skud_hours[emp_id][s.attributed_date] += s.hours
-            skud_shift_types[emp_id][s.attributed_date] = s.shift_type.value
+            if s.shift_type == ShiftType.NIGHT:
+                skud_night_hours[emp_id][s.attributed_date] += s.hours
+            else:
+                skud_day_hours[emp_id][s.attributed_date] += s.hours
+
+    # Keep combined index for summary/totals use
+    skud_hours = defaultdict(lambda: defaultdict(float))
+    for emp_id in set(list(skud_day_hours.keys()) + list(skud_night_hours.keys())):
+        for d, h in skud_day_hours[emp_id].items():
+            skud_hours[emp_id][d] += h
+        for d, h in skud_night_hours[emp_id].items():
+            skud_hours[emp_id][d] += h
 
     # Build broken shifts index: {employee_id: {date: True}}
     broken_dates = defaultdict(lambda: defaultdict(bool))
@@ -59,11 +69,12 @@ def compare(
 
         days_data = {}
         for d in dates:
-            # Find tabell hours for this date
-            tabell_h = _get_tabell_hours(entries, d)
-            # Get SKUD hours
-            skud_h = skud_hours.get(emp_id, {}).get(d, 0.0)
-            shift_type = skud_shift_types.get(emp_id, {}).get(d, None)
+            tabell_h, is_night = _get_tabell_hours_and_type(entries, d)
+            # Match SKUD hours by the shift type indicated in the tabell
+            if is_night:
+                skud_h = skud_night_hours.get(emp_id, {}).get(d, 0.0)
+            else:
+                skud_h = skud_day_hours.get(emp_id, {}).get(d, 0.0)
             is_broken = broken_dates.get(emp_id, {}).get(d, False)
 
             diff = round(tabell_h - skud_h, 1)
@@ -73,7 +84,7 @@ def compare(
                 'skud': round(skud_h, 1),
                 'diff': diff,
                 'broken': is_broken,
-                'shift_type': shift_type,
+                'shift_type': 'night' if is_night else 'day',
             }
 
         broken_count = sum(1 for v in days_data.values() if v['broken'])
@@ -158,13 +169,15 @@ def compare(
     }
 
 
-def _get_tabell_hours(entries: list[TabellEntry], d: date) -> float:
-    """Get hours from tabell entries for a specific date."""
+def _get_tabell_hours_and_type(entries: list[TabellEntry], d: date) -> tuple[float, bool]:
+    """Return (hours, is_night) from tabell for a specific date."""
     for entry in entries:
         month_num = MONTH_MAP.get(entry.month, 0)
         if month_num == d.month:
-            return entry.daily_hours.get(d.day, 0.0)
-    return 0.0
+            hours = entry.daily_hours.get(d.day, 0.0)
+            is_night = d.day in entry.daily_is_night
+            return hours, is_night
+    return 0.0, False
 
 
 def _estimate_shift_type(hour: int) -> str:

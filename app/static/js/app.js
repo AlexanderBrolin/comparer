@@ -431,15 +431,21 @@ document.addEventListener('DOMContentLoaded', () => {
                             <div class="cell-diff">N</div>
                         </div>`;
                 } else {
-                    const colorClass = day.diff === 0 ? 'cell-green'
-                        : day.diff > 0 ? 'cell-red'
-                        : 'cell-orange';
+                    const excess = Math.round((day.skud - day.tabell) * 10) / 10;
+                    let colorClass;
+                    if (excess > 1.1) {
+                        colorClass = 'cell-orange';
+                    } else if (excess > 0.9) {
+                        colorClass = 'cell-green';
+                    } else {
+                        colorClass = 'cell-red';
+                    }
                     td.classList.add(colorClass);
-                    const diffSign = day.diff > 0 ? '+' : '';
+                    const sign = excess > 0 ? '+' : '';
                     td.innerHTML = `
                         <div class="cell-inner">
                             <div class="cell-hours">${day.tabell} / ${day.skud}</div>
-                            <div class="cell-diff">${diffSign}${day.diff}</div>
+                            <div class="cell-diff">${sign}${excess}</div>
                         </div>`;
                 }
                 tr.appendChild(td);

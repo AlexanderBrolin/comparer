@@ -111,10 +111,13 @@ def fetch_tabell(spreadsheet_id: str, gid: str, date_from: date, date_to: date) 
 
         # Parse daily hours (columns E–AI = days 1–31)
         daily_hours = {}
+        daily_is_night = set()
         for col_idx in range(COL_DAYS_START, min(COL_DAYS_END + 1, len(row))):
             day_num = col_idx - COL_DAYS_START + 1  # 1-based day number
             cell_val = row[col_idx].strip() if row[col_idx] else ''
             daily_hours[day_num] = parse_hours(cell_val)
+            if '(' in cell_val:
+                daily_is_night.add(day_num)
 
         entries.append(TabellEntry(
             employee_id=employee_id,
@@ -123,6 +126,7 @@ def fetch_tabell(spreadsheet_id: str, gid: str, date_from: date, date_to: date) 
             company=company,
             month=month_str.capitalize(),
             daily_hours=daily_hours,
+            daily_is_night=daily_is_night,
             project=project,
         ))
 

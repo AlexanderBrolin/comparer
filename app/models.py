@@ -36,6 +36,7 @@ class TabellEntry:
     company: str
     month: str
     daily_hours: dict  # day_number (int) -> hours (float)
+    daily_is_night: set = field(default_factory=set)  # day numbers marked with '('
     project: str = ''
 
 
