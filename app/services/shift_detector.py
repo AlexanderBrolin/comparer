@@ -132,7 +132,10 @@ def _detect_employee_shifts(employee_id: str, punches: list[PunchRecord]) -> lis
             if q.punch_date > next_date:
                 break
             if q.punch_date == p.punch_date:
-                best_j = j  # same-day early exit (take latest)
+                # Only accept same-day end if it's a plausible early departure (≥4h in).
+                # Rejects spurious double-swipes at the same checkpoint within minutes.
+                if (q.punch_datetime - p.punch_datetime).total_seconds() >= 4 * 3600:
+                    best_j = j  # same-day early exit (take latest)
             elif q.punch_date == next_date and q.punch_datetime.hour <= 2:
                 if best_j is None:
                     best_j = j  # first crossing-midnight end (only if no same-day end)
@@ -179,7 +182,9 @@ def _detect_employee_shifts(employee_id: str, punches: list[PunchRecord]) -> lis
             if q.punch_date > next_date:
                 break
             if q.punch_date == p.punch_date:
-                best_j = j  # same-day end (employee left before midnight)
+                # Only accept same-day end if it's a plausible early departure (≥4h in).
+                if (q.punch_datetime - p.punch_datetime).total_seconds() >= 4 * 3600:
+                    best_j = j  # same-day end (employee left before midnight)
             elif q.punch_date == next_date and q.punch_datetime.hour <= 13:
                 best_j = j  # next-day morning end (crossed midnight)
 
